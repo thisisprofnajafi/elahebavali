@@ -1,18 +1,34 @@
 <?php
 
+use App\Http\Controllers\ChannelController;
+use App\Http\Controllers\Controller;
+use App\Http\Controllers\HookController;
+use App\Http\Controllers\MessageController;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
 
-Route::get('/', function () {
-    return view('welcome');
+Route::post('/webhook/telegram',[HookController::class , 'getMessage']);
+Route::get('/checkupdates/telegram',[HookController::class , 'checkUpdates']);
+
+Route::get('/', function (){
+    return redirect(route('login page'));
+});
+
+Route::get('/login',[Controller::class,'loginPage'])->name('login page');
+Route::get('/code/{email}',[Controller::class,'codePage'])->name('code page');
+Route::post('/login', [Controller::class,'login'])->name('login');
+Route::post('/checkCode',[Controller::class,'checkCode'])->name('check code');
+Route::get('/logout', [ChannelController::class, 'logout'])->name('logout');
+
+Route::group(['prefix' => 'app'], function () {
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::get('/channels', [ChannelController::class, 'getMy'])->name('index');
+        Route::post('/addChannel', [ChannelController::class, 'add'])->name('add channel');
+        Route::get('/channel/{id}/messages', [ChannelController::class, 'getMessages'])->name('channel page');
+        Route::delete('/channel/{id}/delete/{message}', [ChannelController::class, 'delete']);
+        Route::post('/channel/{id}/restore/{message}', [MessageController::class, 'sendMessage'])->name('restore message');
+        Route::post('/channel/{id}/send', [MessageController::class, 'send']);
+        Route::post('/message/sendmessage/channel/{id}', [ChannelController::class, 'sendMessage'])->name('send_to_channel');
+        Route::post('/message/{message}/channel/{id}', [MessageController::class, 'sendMessage']);
+    });
 });
