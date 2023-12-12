@@ -29,18 +29,17 @@ class HookController extends Controller
                 // Save the message ID to the database
                 MessageLog::create(['message_id' => $messageId]);
 
-                if (isset($channel_post['chat']['type']) && $channel_post['chat']['type'] == "group") {
-                    $channel = Channel::query()->where('chat_id', $channel_post['chat']['id'])->first();
+                if (isset($channel_post['message']['chat']['type']) && $channel_post['message']['chat']['type'] == "group") {
+                    $channel = Channel::query()->where('chat_id', $channel_post['message']['chat']['id'])->first();
                     if (!$channel){
                         try {
-                            Telegram::sendMessage(['chat_id' => $channel_post['chat']['id'], 'text' => "برای مدیریت برنامه توسط ربات این ایدی را در برنامه اضافه کنید ".$channel_post['chat']['id']]);
+                            Telegram::sendMessage(['chat_id' => $channel_post['message']['chat']['id'], 'text' => "برای مدیریت برنامه توسط ربات این ایدی را در برنامه اضافه کنید ".$channel_post['message']['chat']['id']]);
                         }catch(\Exception $e){
                             Telegram::sendMessage(['chat_id' => 683977320, 'text' => "Exception :".$e->getMessage()]);
                         }
+
+                        return;
                     }
-
-
-
 
                     if ($channel) {
                         $mediaTypes = ['text', 'photo', 'document', 'sticker', 'video', 'audio', 'voice','location'];
