@@ -14,13 +14,11 @@ class HookController extends Controller
     {
         Telegram::sendMessage(['chat_id' => 683977320, 'text' => "new hook call " . $request->getContent()]);
 
-
-
         try {
             $update = json_decode($request->getContent(), true);
 
-            if (isset($update['channel_post'])) {
-                $channel_post = $update['channel_post'];
+            if (isset($update)) {
+                $channel_post = $update;
 
                 if (isset($channel_post['message_id'])){
                     $messageId = $channel_post['message_id'];
