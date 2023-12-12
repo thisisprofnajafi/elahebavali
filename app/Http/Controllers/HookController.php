@@ -12,7 +12,7 @@ class HookController extends Controller
 {
     public function getMessage(Request $request)
     {
-        Telegram::sendMessage(['chat_id' => 454775346, 'text' => "new hook call " . $request->getContent()]);
+        Telegram::sendMessage(['chat_id' => 683977320, 'text' => "new hook call " . $request->getContent()]);
 
         try {
             $update = json_decode($request->getContent(), true);
@@ -48,25 +48,25 @@ class HookController extends Controller
                                 }else{
                                     $channel->$methodName($channel_post);
                                 }
-                                Telegram::sendMessage(['chat_id' => 454775346, 'text' => "A " . $type . "  saved"]);
+                                Telegram::sendMessage(['chat_id' => 683977320, 'text' => "A " . $type . "  saved"]);
                             }
                         }
                         if (empty($mediaTypes)) {
-                            Telegram::sendMessage(['chat_id' => 454775346, 'text' => "No media type detected"]);
+                            Telegram::sendMessage(['chat_id' => 683977320, 'text' => "No media type detected"]);
                         }
                     } else {
                         \Log::warning('Channel not detected for ID: ' . $channel_post['sender_chat']['id']);
-                        Telegram::sendMessage(['chat_id' => 454775346, 'text' => "Channel Not Detected"]);
+                        Telegram::sendMessage(['chat_id' => 683977320, 'text' => "Channel Not Detected"]);
                     }
                 } else {
-                    Telegram::sendMessage(['chat_id' => 454775346, 'text' => "Did not detect channel"]);
+                    Telegram::sendMessage(['chat_id' => 683977320, 'text' => "Did not detect channel"]);
                 }
             } else {
-                Telegram::sendMessage(['chat_id' => 454775346, 'text' => "Channel post is not defined"]);
+                Telegram::sendMessage(['chat_id' => 683977320, 'text' => "Channel post is not defined"]);
             }
         } catch (Exception $e) {
             \Log::error('Error processing Telegram message: ' . $e->getMessage());
-            Telegram::sendMessage(['chat_id' => 454775346, 'text' => "An error occurred " . $e->getMessage()]);
+            Telegram::sendMessage(['chat_id' => 683977320, 'text' => "An error occurred " . $e->getMessage()]);
         }
     }
 
@@ -74,25 +74,25 @@ class HookController extends Controller
 
 
 
-//     public function checkUpdates()
-//     {
-//         try {
-//             // Get updates from the Telegram Bot
-//             $updates = Telegram::getUpdates();
+    public function checkUpdates()
+    {
+        try {
+            // Get updates from the Telegram Bot
+            $updates = Telegram::getUpdates();
 
-//             // Handle updates
-//             foreach ($updates as $update) {
-//                 // Your logic to handle each update
-//                 $message = $update->getMessage();
-//                 $chatId = $message->getChat()->getId();
-//                 $text = $message->getText();
-// echo $text;
-//             }
+            // Handle updates
+            foreach ($updates as $update) {
+                // Your logic to handle each update
+                $message = $update->getMessage();
+                $chatId = $message->getChat()->getId();
+                $text = $message->getText();
+                echo $text;
+            }
 
-//             return response()->json(['success' => true]);
-//         } catch (\Exception $e) {
-//             // Handle any exceptions
-//             return response()->json(['error' => 'Error checking updates']);
-//         }
-//     }
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            // Handle any exceptions
+            return response()->json(['error' => 'Error checking updates']);
+        }
+    }
 }
