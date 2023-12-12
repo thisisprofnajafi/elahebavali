@@ -46,24 +46,11 @@ class ChannelController extends Controller
             if ($channel) {
                 $channelName = $channel['title'];
                 $channelId = $channel['id'];
-                $profilePhoto = $channel->getPhoto();
                 $ch = new Channel();
                 $ch->title = $channelName;
                 $ch->channel_id = $request->id;
                 $ch->chat_id = $channelId;
-                $members = Telegram::getChatMemberCount(['chat_id' => $request->id]);
-                $ch->members_count = $members;
-
-                if ($profilePhoto) {
-                    $profilePhotoFile = Telegram::getFile(['file_id' => $profilePhoto['big_file_id']]);
-                    $profilePhotoUrl = 'https://api.telegram.org/file/bot' . env('TELEGRAM_BOT_TOKEN') . '/' . $profilePhotoFile->getFilePath();
-                    $localFilePath = public_path('media/channels/' . $request->id . '.jpg');
-                    file_put_contents($localFilePath, file_get_contents($profilePhotoUrl));
-                    $ch->profile_path = 'media/channels/' . $request->id . '.jpg';
-                }
-
                 $user->channels()->save($ch);
-
                 return redirect(route('index'));
             }
 

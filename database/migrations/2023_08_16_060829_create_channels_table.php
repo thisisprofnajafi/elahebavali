@@ -17,8 +17,6 @@ return new class extends Migration
             $table->string("channel_id");
             $table->string("chat_id");
             $table->string('title');
-            $table->integer('members_count');
-            $table->string("profile_path")->default(null)->nullable();
             $table->timestamps();
         });
     }
