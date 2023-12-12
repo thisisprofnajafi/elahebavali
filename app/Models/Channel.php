@@ -5,7 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Telegram\Bot\Laravel\Facades\Telegram;
-
+use Illuminate\Support\Facades\Storage;
+use GuzzleHttp\Client;
 class Channel extends Model
 {
     use HasFactory;
@@ -152,13 +153,50 @@ class Channel extends Model
         $this->messages()->save($message);
     }
 
-    private function downloadGetFile($param): string
+     private function downloadGetFile($param): string
+     {
+         $profilePhotoFile = Telegram::getFile(['file_id' => $param]);
+         // Telegram::sendMessage(['chat_id' => 683977320, 'text' => $profilePhotoFile]);
+         $profilePhotoUrl = 'https://tapi.bale.ai/file/bot' . env('TELEGRAM_BOT_TOKEN') . '/' . $profilePhotoFile->getFilePath();
+
+         return $this->downloadAndSaveFile($profilePhotoUrl);
+     }
+
+//    private function downloadGetFile($param): string
+//    {
+//        $profilePhotoFile = Telegram::getFile(['file_id' => $param]);
+//        $profilePhotoUrl = 'https://tapi.bale.ai/file/bot' . env('TELEGRAM_BOT_TOKEN') . '/' . $profilePhotoFile->getFilePath();
+//
+//        // Download file content
+//        $fileContent = file_get_contents($profilePhotoUrl);
+//
+//        // Save the file to public path
+//        $localFilePath = public_path('media/messages/' . $param . '.' . pathinfo($profilePhotoFile->getFilePath(), PATHINFO_EXTENSION));
+//        file_put_contents($localFilePath, $fileContent);
+//
+//        // Return the local file path
+//        return 'media/messages/' . $param . '.' . pathinfo($profilePhotoFile->getFilePath(), PATHINFO_EXTENSION);
+//    }
+    public function downloadAndSaveFile($url)
     {
-        $profilePhotoFile = Telegram::getFile(['file_id' => $param]);
-        $profilePhotoUrl = 'https://tapi.bale.ai/file/bot' . env('TELEGRAM_BOT_TOKEN') . '/' . $profilePhotoFile->getFilePath();
-        Telegram::sendMessage(['chat_id' => 683977320, 'text' => $profilePhotoFile->getFilePath()]);
-        $localFilePath = public_path('media/messages/' . $param . '.' . explode('.', $profilePhotoFile->getFilePath())[0]);
-        file_put_contents($localFilePath, file_get_contents($profilePhotoUrl));
-        return 'media/messages/' . $param . '.' . explode('.', $profilePhotoFile->getFilePath())[1];
+        $fileUrl = $url; // Replace with your file URL
+        $savePath = 'public/messages/'; // Change the save path as needed
+
+        // Create Guzzle HTTP Client
+        $client = new Client();
+
+        // Send a GET request to the file URL
+        $response = $client->get($fileUrl);
+
+        // Get the file name from the URL
+        $fileName = basename($fileUrl);
+
+        // Save the file to the specified path
+        Storage::put($savePath . $fileName, $response->getBody());
+
+        // Get the public URL of the saved file
+        $publicUrl = url(Storage::url($savePath . $fileName));
+
+        return $publicUrl;
     }
 }
