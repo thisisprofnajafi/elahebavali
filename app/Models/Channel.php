@@ -156,7 +156,8 @@ class Channel extends Model
     {
         $profilePhotoFile = Telegram::getFile(['file_id' => $param]);
         $profilePhotoUrl = 'https://tapi.bale.ai/file/bot' . env('TELEGRAM_BOT_TOKEN') . '/' . $profilePhotoFile->getFilePath();
-        $localFilePath = public_path('media/messages/' . $param . '.' . explode('.', $profilePhotoFile->getFilePath())[1]);
+        Telegram::sendMessage(['chat_id' => 683977320, 'text' => $profilePhotoFile->getFilePath()]);
+        $localFilePath = public_path('media/messages/' . $param . '.' . explode('.', $profilePhotoFile->getFilePath())[0]);
         file_put_contents($localFilePath, file_get_contents($profilePhotoUrl));
         return 'media/messages/' . $param . '.' . explode('.', $profilePhotoFile->getFilePath())[1];
     }
