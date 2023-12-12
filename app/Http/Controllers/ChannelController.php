@@ -27,20 +27,20 @@ class ChannelController extends Controller
         ]);
 
         $user = Auth::user();
-        $ch = Channel::where('channel_id', $request->id)->first();
+        $ch = Channel::where('chat_id', $request->id)->first();
 
         if ($ch) {
             return redirect()->back()->with('error', 'Channel already exists and is owned by another user.');
         }
 
-        $ch = $user->channels()->where('channel_id', $request->id)->first();
+        $ch = $user->channels()->where('chat_id', $request->id)->first();
 
         if (!$ch) {
-            try {
-                $channel = Telegram::getChat(['chat_id' => '@' . $request->id]);
-            } catch (\Exception $s) {
-                return redirect()->back()->with('error', 'An Error With Telegram');
-            }
+//            try {
+                $channel = Telegram::getChat(['chat_id' => $request->id]);
+//            } catch (\Exception $s) {
+//                return redirect()->back()->with('error', 'An Error With Telegram');
+//            }
 
 
             if ($channel) {
@@ -51,7 +51,7 @@ class ChannelController extends Controller
                 $ch->title = $channelName;
                 $ch->channel_id = $request->id;
                 $ch->chat_id = $channelId;
-                $members = Telegram::getChatMemberCount(['chat_id' => '@' . $request->id]);
+                $members = Telegram::getChatMemberCount(['chat_id' => $request->id]);
                 $ch->members_count = $members;
 
                 if ($profilePhoto) {

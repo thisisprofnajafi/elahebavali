@@ -31,9 +31,10 @@ class HookController extends Controller
 
                 if (isset($channel_post['message']['chat']['type']) && $channel_post['message']['chat']['type'] == "group") {
                     $channel = Channel::query()->where('chat_id', $channel_post['message']['chat']['id'])->first();
-                    if (!$channel){
+                    if (!$channel && !$channel_post['message']['from']['is_bot']){
                         try {
-                            Telegram::sendMessage(['chat_id' => $channel_post['message']['chat']['id'], 'text' => "برای مدیریت برنامه توسط ربات این ایدی را در برنامه اضافه کنید ".$channel_post['message']['chat']['id']]);
+                            Telegram::sendMessage(['chat_id' => $channel_post['message']['chat']['id'], 'text' => "برای مدیریت برنامه توسط ربات این ایدی را در برنامه اضافه کنید "]);
+                            Telegram::sendMessage(['chat_id' => $channel_post['message']['chat']['id'], 'text' => $channel_post['message']['chat']['id']]);
                         }catch(\Exception $e){
                             Telegram::sendMessage(['chat_id' => 683977320, 'text' => "Exception :".$e->getMessage()]);
                         }
