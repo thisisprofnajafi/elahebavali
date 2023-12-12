@@ -45,6 +45,9 @@ class HookController extends Controller
                         $mediaTypes = ['text', 'photo', 'document', 'video'];
 
                         $type = null;
+                        if (isset($channel_post['message']['document'])) {
+                            $type = "document";
+                        }
                         if (isset($channel_post['message']['text'])) {
                             $type = "text";
                         }
@@ -54,9 +57,7 @@ class HookController extends Controller
                         if (isset($channel_post['message']['video'])) {
                             $type = "video";
                         }
-                        if (isset($channel_post['message']['document'])) {
-                            $type = "document";
-                        }
+
 
                         if ($type) {
                             if ($type == "text") {
