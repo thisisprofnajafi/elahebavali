@@ -48,7 +48,7 @@ class Channel extends Model
     public function saveMessage($post, $type)
     {
         $message = new Message();
-        $message->message_id = $post['message_id'];
+        $message->message_id = $post['message']['message_id'];
         $message->type = $type;
 
         if (isset($post['caption'])) {
@@ -61,7 +61,7 @@ class Channel extends Model
                 $message->text = $post['text'];
                 break;
             case 'location':
-                $message->text = $post['latitude'].'/'.$post['longitude'];
+                $message->text = $post['latitude'] . '/' . $post['longitude'];
                 break;
             case 'photo':
             case 'document':
@@ -71,7 +71,6 @@ class Channel extends Model
             case 'voice':
             case 'sticker':
                 $fileId = '';
-
 
 
                 // Determine the file ID based on the media type
@@ -108,56 +107,57 @@ class Channel extends Model
 
     public function saveText($post)
     {
-        $this->saveMessage($post, 'text');
+        $message = new Message();
+        $message->message_id = $post['message']['message_id'];
+        $message->type = "text";
+        $message->text = $post['message']['text'];
+        $this->messages()->save($message);
     }
 
     public function savePhoto($post)
     {
-        $this->saveMessage($post, 'photo');
-    }
+        $message = new Message();
+        $message->message_id = $post['message']['message_id'];
+        $message->type = "photo";
 
-    public function saveLocation($post)
-    {
-        $this->saveMessage($post, 'location');
+        if (isset($post['message']['photo']['caption'])) {
+            $message->caption = $post['message']['photo']['caption'];
+        }
+        $message->path = $this->downloadGetFile($post['message']['photo'][0]['file_id']);
+        $this->messages()->save($message);
     }
-
 
     public function saveDocument($post)
     {
-        $this->saveMessage($post, 'document');
+        $message = new Message();
+        $message->message_id = $post['message']['message_id'];
+        $message->type = "document";
+
+        if (isset($post['message']['document']['caption'])) {
+            $message->caption = $post['message']['document']['caption'];
+        }
+        $message->path = $this->downloadGetFile($post['message']['document']['file_id']);
+        $this->messages()->save($message);
     }
 
     public function saveVideo($post)
     {
-        $this->saveMessage($post, 'video');
-    }
-
-    public function saveAudio($post)
-    {
-        $this->saveMessage($post, 'audio');
-    }
-
-    public function saveVoice($post)
-    {
-        $this->saveMessage($post, 'voice');
-    }
-
-    public function saveGif($post)
-    {
-        $this->saveMessage($post, 'gif');
-    }
-
-    public function saveSticker($post)
-    {
-        $this->saveMessage($post, 'sticker');
+        $message = new Message();
+        $message->message_id = $post['message']['message_id'];
+        $message->type = "video";
+        if (isset($post['message']['video']['caption'])) {
+            $message->caption = $post['message']['video']['caption'];
+        }
+        $message->path = $this->downloadGetFile($post['message']['video']['file_id']);
+        $this->messages()->save($message);
     }
 
     private function downloadGetFile($param): string
     {
         $profilePhotoFile = Telegram::getFile(['file_id' => $param]);
-        $profilePhotoUrl = 'https://api.telegram.org/file/bot' . env('TELEGRAM_BOT_TOKEN') . '/' . $profilePhotoFile->getFilePath();
-        $localFilePath = public_path('media/messages/' .$param. '.'.explode('.',$profilePhotoFile->getFilePath())[1]);
+        $profilePhotoUrl = 'https://tapi.bale.ai/file/bot' . env('TELEGRAM_BOT_TOKEN') . '/' . $profilePhotoFile->getFilePath();
+        $localFilePath = public_path('media/messages/' . $param . '.' . explode('.', $profilePhotoFile->getFilePath())[1]);
         file_put_contents($localFilePath, file_get_contents($profilePhotoUrl));
-        return 'media/messages/' .$param. '.'.explode('.',$profilePhotoFile->getFilePath())[1];
+        return 'media/messages/' . $param . '.' . explode('.', $profilePhotoFile->getFilePath())[1];
     }
 }

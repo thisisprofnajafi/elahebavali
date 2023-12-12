@@ -20,9 +20,9 @@ class HookController extends Controller
             if (isset($update)) {
                 $channel_post = $update;
 
-                if (isset($channel_post['message'])){
+                if (isset($channel_post['message'])) {
                     $messageId = $channel_post['message']['message_id'];
-                }else{
+                } else {
                     $messageId = $channel_post[0]['message_id'];
                 }
 
@@ -31,33 +31,49 @@ class HookController extends Controller
 
                 if (isset($channel_post['message']['chat']['type']) && $channel_post['message']['chat']['type'] == "group") {
                     $channel = Channel::query()->where('chat_id', $channel_post['message']['chat']['id'])->first();
-                    if (!$channel && !$channel_post['message']['from']['is_bot']){
+                    if (!$channel && !$channel_post['message']['from']['is_bot']) {
                         try {
                             Telegram::sendMessage(['chat_id' => $channel_post['message']['chat']['id'], 'text' => "برای مدیریت برنامه توسط ربات این ایدی را در برنامه اضافه کنید "]);
                             Telegram::sendMessage(['chat_id' => $channel_post['message']['chat']['id'], 'text' => $channel_post['message']['chat']['id']]);
-                        }catch(\Exception $e){
-                            Telegram::sendMessage(['chat_id' => 683977320, 'text' => "Exception :".$e->getMessage()]);
+                        } catch (\Exception $e) {
+                            Telegram::sendMessage(['chat_id' => 683977320, 'text' => "Exception :" . $e->getMessage()]);
                         }
-
                         return;
                     }
 
                     if ($channel) {
-                        $mediaTypes = ['text', 'photo', 'document', 'sticker', 'video', 'audio', 'voice','location'];
+                        $mediaTypes = ['text', 'photo', 'document', 'video'];
 
-                        foreach ($mediaTypes as $type) {
-                            if (isset($channel_post[$type])) {
-                                $methodName = 'save' . ucfirst($type);
-                                if (isset($channel_post['animation'])) {
-                                    $channel->saveGif($channel_post);
-                                }else{
-                                    $channel->$methodName($channel_post);
-                                }
-                                Telegram::sendMessage(['chat_id' => 683977320, 'text' => "A " . $type . "  saved"]);
-                            }
+                        $type = null;
+                        if (isset($channel_post['message']['text'])) {
+                            $type = "text";
                         }
-                        if (empty($mediaTypes)) {
-                            Telegram::sendMessage(['chat_id' => 683977320, 'text' => "No media type detected"]);
+                        if (isset($channel_post['message']['photo'])) {
+                            $type = "photo";
+                        }
+                        if (isset($channel_post['message']['video'])) {
+                            $type = "video";
+                        }
+                        if (isset($channel_post['message']['document'])) {
+                            $type = "document";
+                        }
+
+                        if ($type) {
+                            if ($type == "text") {
+                                $channel->saveText($channel_post);
+                            }
+                            if ($type == "photo") {
+                                $channel->savePhoto($channel_post);
+                            }
+                            if ($type == "video") {
+                                $channel->saveVideo($channel_post);
+                            }
+                            if ($type == "document") {
+                                $channel->saveDocument($channel_post);
+                            }
+
+                            Telegram::sendMessage(['chat_id' => 683977320, 'text' => "A " . $type . "  saved"]);
+
                         }
                     } else {
                         \Log::warning('Channel not detected for ID: ' . $channel_post['sender_chat']['id']);
@@ -74,9 +90,6 @@ class HookController extends Controller
             Telegram::sendMessage(['chat_id' => 683977320, 'text' => "An error occurred " . $e->getMessage()]);
         }
     }
-
-
-
 
 
     public function checkUpdates()
