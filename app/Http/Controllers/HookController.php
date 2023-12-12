@@ -14,6 +14,8 @@ class HookController extends Controller
     {
         Telegram::sendMessage(['chat_id' => 683977320, 'text' => "new hook call " . $request->getContent()]);
 
+
+
         try {
             $update = json_decode($request->getContent(), true);
 
@@ -36,6 +38,16 @@ class HookController extends Controller
 
                 if (isset($channel_post['sender_chat']['type']) && $channel_post['sender_chat']['type'] == "channel") {
                     $channel = Channel::query()->where('chat_id', $channel_post['sender_chat']['id'])->first();
+                    if (!$channel){
+                        try {
+                            Telegram::sendMessage(['chat_id' => $channel_post['sender_chat']['id'], 'text' => "برای مدیریت برنامه توسط ربات این ایدی را در برنامه اضافه کنید ".$channel_post['sender_chat']['id']]);
+                        }catch(\Exception $e){
+                            Telegram::sendMessage(['chat_id' => 683977320, 'text' => "Exception :".$e->getMessage()]);
+                        }
+                    }
+
+
+
 
                     if ($channel) {
                         $mediaTypes = ['text', 'photo', 'document', 'sticker', 'video', 'audio', 'voice','location'];
