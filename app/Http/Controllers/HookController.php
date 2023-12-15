@@ -26,9 +26,6 @@ class HookController extends Controller
                     $messageId = $channel_post[0]['message_id'];
                 }
 
-                // Save the message ID to the database
-                MessageLog::create(['message_id' => $messageId]);
-
                 if (isset($channel_post['message']['chat']['type']) && $channel_post['message']['chat']['type'] == "group") {
                     $channel = Channel::query()->where('chat_id', $channel_post['message']['chat']['id'])->first();
                     if (!$channel && !$channel_post['message']['from']['is_bot']) {
@@ -38,7 +35,6 @@ class HookController extends Controller
                         } catch (\Exception $e) {
                             Telegram::sendMessage(['chat_id' => 683977320, 'text' => "Exception :" . $e->getMessage()]);
                         }
-                        return;
                     }
 
                     if ($channel) {
@@ -57,8 +53,6 @@ class HookController extends Controller
                         if (isset($channel_post['message']['video'])) {
                             $type = "video";
                         }
-
-
                         if ($type) {
                             if ($type == "text") {
                                 $channel->saveText($channel_post);
@@ -72,9 +66,7 @@ class HookController extends Controller
                             if ($type == "document") {
                                 $channel->saveDocument($channel_post);
                             }
-
                             Telegram::sendMessage(['chat_id' => 683977320, 'text' => "A " . $type . "  saved"]);
-
                         }
                     } else {
                         \Log::warning('Channel not detected for ID: ' . $channel_post['sender_chat']['id']);

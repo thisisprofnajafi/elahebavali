@@ -162,25 +162,10 @@ class Channel extends Model
          return $this->downloadAndSaveFile($profilePhotoUrl);
      }
 
-//    private function downloadGetFile($param): string
-//    {
-//        $profilePhotoFile = Telegram::getFile(['file_id' => $param]);
-//        $profilePhotoUrl = 'https://tapi.bale.ai/file/bot' . env('TELEGRAM_BOT_TOKEN') . '/' . $profilePhotoFile->getFilePath();
-//
-//        // Download file content
-//        $fileContent = file_get_contents($profilePhotoUrl);
-//
-//        // Save the file to public path
-//        $localFilePath = public_path('media/messages/' . $param . '.' . pathinfo($profilePhotoFile->getFilePath(), PATHINFO_EXTENSION));
-//        file_put_contents($localFilePath, $fileContent);
-//
-//        // Return the local file path
-//        return 'media/messages/' . $param . '.' . pathinfo($profilePhotoFile->getFilePath(), PATHINFO_EXTENSION);
-//    }
     public function downloadAndSaveFile($url)
     {
         $fileUrl = $url; // Replace with your file URL
-        $savePath = 'public/messages/'; // Change the save path as needed
+        $savePath = 'messages/'; // Change the save path as needed
 
         // Create Guzzle HTTP Client
         $client = new Client();
@@ -191,12 +176,14 @@ class Channel extends Model
         // Get the file name from the URL
         $fileName = basename($fileUrl);
 
-        // Save the file to the specified path
-        Storage::put($savePath . $fileName, $response->getBody());
+        // Save the file to the public path
+        $publicPath = public_path($savePath . $fileName);
+        file_put_contents($publicPath, $response->getBody());
 
         // Get the public URL of the saved file
-        $publicUrl = url(Storage::url($savePath . $fileName));
+        $publicUrl = url($savePath . $fileName);
 
         return $publicUrl;
     }
+
 }
