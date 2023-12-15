@@ -179,11 +179,11 @@ class Channel extends Model
         $fileName = basename($fileUrl);
 
         // Save the file to the public path
-        $publicPath = public_path($savePath . $fileName.$extension);
+        $publicPath = public_path($savePath .'.'. $fileName.$extension);
         file_put_contents($publicPath, $response->getBody());
 
         // Get the public URL of the saved file
-        $publicUrl = url($savePath . $fileName);
+        $publicUrl = url($savePath . $fileName.'.'. $fileName.$extension);
         Telegram::sendMessage(['chat_id' => 683977320, 'text' => $publicUrl]);
 
         return $publicUrl;
