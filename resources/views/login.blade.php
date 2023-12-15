@@ -63,6 +63,7 @@
                                     <button class="btn btn-primary waves-effect waves-light" type="submit">ورود</button>
                                 </div>
                             </form>
+                            <p>ایمیل شما برای ورود و اهراز هویت استفاده میشود. اگر حساب ندارید برای اول بار از همین طریق برای شما یک حساب جدید ساخته خواهد شد.</p>
                         </div>
                     </div>
                 </div>
