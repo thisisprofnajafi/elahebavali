@@ -124,7 +124,7 @@ class Channel extends Model
         if (isset($post['message']['photo']['caption'])) {
             $message->caption = $post['message']['photo']['caption'];
         }
-        $message->path = $this->downloadGetFile($post['message']['photo'][0]['file_id']);
+        $message->path = $this->downloadGetFile($post['message']['photo'][0]['file_id'],$post['message']['photo']['file_name']);
         $this->messages()->save($message);
     }
 
@@ -137,7 +137,7 @@ class Channel extends Model
         if (isset($post['message']['document']['caption'])) {
             $message->caption = $post['message']['document']['caption'];
         }
-        $message->path = $this->downloadGetFile($post['message']['document']['file_id']);
+        $message->path = $this->downloadGetFile($post['message']['document']['file_id'],$post['message']['document']['file_name']);
         $this->messages()->save($message);
     }
 
@@ -149,20 +149,22 @@ class Channel extends Model
         if (isset($post['message']['video']['caption'])) {
             $message->caption = $post['message']['video']['caption'];
         }
-        $message->path = $this->downloadGetFile($post['message']['video']['file_id']);
+        $message->path = $this->downloadGetFile($post['message']['video']['file_id'],$post['message']['video']['file_name']);
         $this->messages()->save($message);
     }
 
-     private function downloadGetFile($param): string
+     private function downloadGetFile($param,$file_name): string
      {
          $profilePhotoFile = Telegram::getFile(['file_id' => $param]);
          // Telegram::sendMessage(['chat_id' => 683977320, 'text' => $profilePhotoFile]);
          $profilePhotoUrl = 'https://tapi.bale.ai/file/bot' . env('TELEGRAM_BOT_TOKEN') . '/' . $profilePhotoFile->getFilePath();
+         $file_info = pathinfo($file_name);
 
-         return $this->downloadAndSaveFile($profilePhotoUrl);
+         $file_extension = $file_info['extension'];
+         return $this->downloadAndSaveFile($profilePhotoUrl, $file_extension);
      }
 
-    public function downloadAndSaveFile($url)
+    public function downloadAndSaveFile($url,$extension)
     {
         $fileUrl = $url; // Replace with your file URL
         $savePath = 'messages/'; // Change the save path as needed
@@ -177,7 +179,7 @@ class Channel extends Model
         $fileName = basename($fileUrl);
 
         // Save the file to the public path
-        $publicPath = public_path($savePath . $fileName);
+        $publicPath = public_path($savePath . $fileName.$extension);
         file_put_contents($publicPath, $response->getBody());
 
         // Get the public URL of the saved file
