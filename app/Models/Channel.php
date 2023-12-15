@@ -4,9 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 use Telegram\Bot\Laravel\Facades\Telegram;
 use Illuminate\Support\Facades\Storage;
 use GuzzleHttp\Client;
+
 class Channel extends Model
 {
     use HasFactory;
@@ -124,7 +126,7 @@ class Channel extends Model
         if (isset($post['message']['photo']['caption'])) {
             $message->caption = $post['message']['photo']['caption'];
         }
-        $message->path = $this->downloadGetFile($post['message']['photo'][0]['file_id'],$post['message']['document']['file_name']);
+        $message->path = $this->downloadGetFile($post['message']['photo'][0]['file_id'], $post['message']['document']['file_name']);
         $this->messages()->save($message);
     }
 
@@ -137,7 +139,7 @@ class Channel extends Model
         if (isset($post['message']['document']['caption'])) {
             $message->caption = $post['message']['document']['caption'];
         }
-        $message->path = $this->downloadGetFile($post['message']['document']['file_id'],$post['message']['document']['file_name']);
+        $message->path = $this->downloadGetFile($post['message']['document']['file_id'], $post['message']['document']['file_name']);
         $this->messages()->save($message);
     }
 
@@ -149,22 +151,22 @@ class Channel extends Model
         if (isset($post['message']['video']['caption'])) {
             $message->caption = $post['message']['video']['caption'];
         }
-        $message->path = $this->downloadGetFile($post['message']['video']['file_id'],$post['message']['document']['file_name']);
+        $message->path = $this->downloadGetFile($post['message']['video']['file_id'], $post['message']['document']['file_name']);
         $this->messages()->save($message);
     }
 
-     private function downloadGetFile($param,$file_name): string
-     {
-         $profilePhotoFile = Telegram::getFile(['file_id' => $param]);
-         // Telegram::sendMessage(['chat_id' => 683977320, 'text' => $profilePhotoFile]);
-         $profilePhotoUrl = 'https://tapi.bale.ai/file/bot' . env('TELEGRAM_BOT_TOKEN') . '/' . $profilePhotoFile->getFilePath();
-         $file_info = pathinfo($file_name);
+    private function downloadGetFile($param, $file_name): string
+    {
+        $profilePhotoFile = Telegram::getFile(['file_id' => $param]);
+        // Telegram::sendMessage(['chat_id' => 683977320, 'text' => $profilePhotoFile]);
+        $profilePhotoUrl = 'https://tapi.bale.ai/file/bot' . env('TELEGRAM_BOT_TOKEN') . '/' . $profilePhotoFile->getFilePath();
+        $file_info = pathinfo($file_name);
 
-         $file_extension = $file_info['extension'];
-         return $this->downloadAndSaveFile($profilePhotoUrl, $file_extension);
-     }
+        $file_extension = $file_info['extension'];
+        return $this->downloadAndSaveFile($profilePhotoUrl, $file_extension);
+    }
 
-    public function downloadAndSaveFile($url,$extension)
+    public function downloadAndSaveFile($url, $extension)
     {
         $fileUrl = $url; // Replace with your file URL
         $savePath = 'messages/'; // Change the save path as needed
@@ -176,17 +178,23 @@ class Channel extends Model
         $response = $client->get($fileUrl);
 
         // Get the file name from the URL
-        $fileName = basename($fileUrl);
+        $fileName = generateUniqueRandomString();
 
         // Save the file to the public path
-        $publicPath = public_path($savePath .'.'. $fileName.$extension);
+        $publicPath = public_path($savePath . $fileName . '.' .$extension);
         file_put_contents($publicPath, $response->getBody());
 
         // Get the public URL of the saved file
-        $publicUrl = url($savePath . $fileName.'.'. $fileName.$extension);
+        $publicUrl = url($savePath . $fileName . '.'  . $extension);
         Telegram::sendMessage(['chat_id' => 683977320, 'text' => $publicUrl]);
 
         return $publicUrl;
+    }
+
+    public function generateUniqueRandomString()
+    {
+        return Str::random(20);
+
     }
 
 }
