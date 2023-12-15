@@ -104,29 +104,7 @@
                 </div>
                 <!-- end chat conversation end -->
 
-                <!-- start chat input section -->
-                <form class="chat-input-section p-3 p-lg-4 border-top mb-0">
-                    <div class="row g-0">
-                        <div class="col">
-                            <input type="text" class="form-control form-control-lg bg-light border-light"
-                                   placeholder="تایپ کنید">
-                        </div>
-                        <div class="col-auto">
-                            <div class="chat-input-links ms-md-2 me-md-0">
-                                <ul class="list-inline mb-0">
-                                    <li class="list-inline-item">
-                                        <button type="submit"
-                                                class="btn btn-primary font-size-16 btn-lg chat-send waves-effect waves-light">
-                                            <i class="ri-send-plane-2-fill"></i>
-                                        </button>
-                                    </li>
-                                </ul>
-                            </div>
 
-                        </div>
-                    </div>
-                </form>
-                <!-- end chat input section -->
             </div>
             <!-- end chat conversation section -->
 
