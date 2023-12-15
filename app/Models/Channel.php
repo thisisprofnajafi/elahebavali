@@ -124,7 +124,7 @@ class Channel extends Model
         if (isset($post['message']['photo']['caption'])) {
             $message->caption = $post['message']['photo']['caption'];
         }
-        $message->path = $this->downloadGetFile($post['message']['photo'][0]['file_id'],$post['message']['photo']['file_name']);
+        $message->path = $this->downloadGetFile($post['message']['photo'][0]['file_id'],$post['message']['document']['file_name']);
         $this->messages()->save($message);
     }
 
@@ -149,7 +149,7 @@ class Channel extends Model
         if (isset($post['message']['video']['caption'])) {
             $message->caption = $post['message']['video']['caption'];
         }
-        $message->path = $this->downloadGetFile($post['message']['video']['file_id'],$post['message']['video']['file_name']);
+        $message->path = $this->downloadGetFile($post['message']['video']['file_id'],$post['message']['document']['file_name']);
         $this->messages()->save($message);
     }
 
